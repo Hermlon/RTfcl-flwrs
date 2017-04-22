@@ -63,8 +63,21 @@ void timeBase() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  if (Serial.available() > 0) { 
+    //Command starts:
+    if(Serial.read() == '/') {
+      uint8_t cmd = Serial.read();
+      //play an animation
+      if(cmd == p) {
+        if(Serial.read() == ' ') {
+          
+        }
+        else {
+          Serial.println("usage: /p <matrix_index> <filename>");
+        }
+      }
+    }
+  }
 }
 
 int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
@@ -105,7 +118,7 @@ int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
 void drawImage(uint8_t data[], uint8_t m) {
   Serial.println("-----");
   for(int i = 0; i < 8; i ++) {
-    Serial.println(data[i]);
+    Serial.println(data[i], BIN);
   }
   Serial.println("-----");
   /*
