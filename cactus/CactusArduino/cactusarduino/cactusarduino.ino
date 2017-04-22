@@ -16,11 +16,11 @@ String filename_ml = "";
 String filename_mm = "";
 String filename_mr = "";
 
-uint8_t time_el = 0;
-uint8_t time_er = 0;
-uint8_t time_ml = 0;
-uint8_t time_mm = 0;
-uint8_t time_mr = 0;
+int time_el = 0;
+int time_er = 0;
+int time_ml = 0;
+int time_mm = 0;
+int time_mr = 0;
 
 uint8_t frame_el = 0;
 uint8_t frame_er = 0;
@@ -50,15 +50,14 @@ void setup() {
 }
 
 void timeBase() {
-  Serial.print(frame_el); Serial.print("|"); Serial.println(time_el);
   if(time_el == 0) {
-    frame_el ++;
     time_el = loadFile(filename_el, frame_el, MATRIX_EYEL);
     /*File does not exist -> no more frame -> replay animation*/
     if(time_el == -1) {
       frame_el = 0;
       time_el = loadFile(filename_el, frame_el, MATRIX_EYEL);
     }
+    frame_el ++;
   }
   time_el --;
 }
@@ -68,34 +67,33 @@ void loop() {
 
 }
 
-uint8_t loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
+int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
   readingFile = SD.open(filename + frame + ".txt");
   if(readingFile) {
-    uint8_t duration = 0;
+    int duration = 0;
     uint8_t data[8];
-    for(uint8_t i = 0; i < 8; i ++) {
+    for(int i = 7; i >= 0; i --) {
       uint8_t nextchar = readingFile.read();
-      //Does this work?
-      if(nextchar == 0) {
-        duration ^= (-0 ^ duration) & (1 << i);
+      if(nextchar == '0') {
+        duration |= 0<<i;
       }
       else {
-        duration ^= (-1 ^ duration) & (1 << i);
+        duration |= 1<<i;
       }
     }
     for(uint8_t n = 0; n < 8; n ++) {
       data[n] = 0;
-      for(uint8_t i = 0; i < 8; i ++) {
+      for(int i = 7; i >= 0; i --) {
         uint8_t nextchar = readingFile.read();
-        //Does this work?
-        if(nextchar == 0) {
-          data[n] ^= (-0 ^ data[n]) & (1 << i);
+        if(nextchar == '0') {
+          data[n] |= 0<<i;
         }
         else {
-          data[n] ^= (-1 ^ data[n]) & (1 << i);
+          data[n] |= 1<<i;
         }
       }
     }
+    readingFile.close();
     drawImage(data, matrix_index);
     return duration;
   }
@@ -105,9 +103,11 @@ uint8_t loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
 }
 
 void drawImage(uint8_t data[], uint8_t m) {
+  Serial.println("-----");
   for(int i = 0; i < 8; i ++) {
     Serial.println(data[i]);
   }
+  Serial.println("-----");
   /*
   matrix[m].clear();
   matrix[m].drawBitmap(0, 0, data, 8, 8, LED_ON);
