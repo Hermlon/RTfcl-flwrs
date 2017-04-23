@@ -10,27 +10,22 @@ const uint8_t MATRIX_MOUTHL = 2;
 const uint8_t MATRIX_MOUTHM = 3;
 const uint8_t MATRIX_MOUTHR = 4;
 
-String filename_el = "b1_";
-String filename_er = "";
-String filename_ml = "";
-String filename_mm = "";
-String filename_mr = "";
+String filename[5];
 
-int time_el = 0;
-int time_er = 0;
-int time_ml = 0;
-int time_mm = 0;
-int time_mr = 0;
+int remainingTime[5];
 
-uint8_t frame_el = 0;
-uint8_t frame_er = 0;
-uint8_t frame_ml = 0;
-uint8_t frame_mm = 0;
-uint8_t frame_mr = 0;
+uint8_t frame[5];
 
 File readingFile;
 
 void setup() {
+  //Init
+  for(int i = 0; i < 5; i ++) {
+    filename[i] = "";
+    remainingTime[i] = 0;
+    frame[i] = 0;
+  }
+  
   Serial.begin(9600);
   if(!SD.begin(4)) {
     Serial.println("SD initialization failed!");
@@ -50,33 +45,42 @@ void setup() {
 }
 
 void timeBase() {
-  if(time_el == 0) {
-    time_el = loadFile(filename_el, frame_el, MATRIX_EYEL);
-    /*File does not exist -> no more frame -> replay animation*/
-    if(time_el == -1) {
-      frame_el = 0;
-      time_el = loadFile(filename_el, frame_el, MATRIX_EYEL);
+  for(int m = 0; m < 5; m ++) {
+    if(remainingTime[m] == 0) {
+      remainingTime[m] = loadFile(filename[m], frame[m], m);
+      /*File does not exist -> no more frame -> replay animation*/
+      if(remainingTime[m] == -1) {
+        frame[m] = 0;
+        remainingTime[m] = loadFile(filename[m], frame[m], m);
+        if(remainingTime[m] == -1) {
+          //Error, requested file does not exist
+          //Serial.println("File does not exist: " + filename[m]);
+          //reckeck as soon as possible:
+          remainingTime[m] = 1;
+        }
+      }
+      frame[m] ++;
     }
-    frame_el ++;
+    remainingTime[m] --;
   }
-  time_el --;
 }
 
 void loop() {
-  if (Serial.available() > 0) { 
-    //Command starts:
+  if (Serial.available() > 0) {
     if(Serial.read() == '/') {
-      uint8_t cmd = Serial.read();
-      //play an animation
-      if(cmd == p) {
-        if(Serial.read() == ' ') {
-          
-        }
-        else {
-          Serial.println("usage: /p <matrix_index> <filename>");
-        }
-      }
+      String command = Serial.readStringUntil('\n');
+      Serial.println(command);
+      
     }
+  }
+}
+
+String[] getCommandParts(String cmd, int max) {
+  char myArray[cmd.size()+1];//as 1 char space for null is also required
+  strcpy(myArray, cmd.c_str());
+  String res[max];
+  while(myArray[]) {
+    
   }
 }
 
