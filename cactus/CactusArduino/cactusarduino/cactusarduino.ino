@@ -34,6 +34,7 @@ void setup() {
     Serial.println("SD initialization failed!");
     return;
   }
+  Serial.println("Starting...");
   /*TODO: assign the rigth numbers*/
   matrix[MATRIX_MOUTHL].begin(0x70);
   matrix[MATRIX_MOUTHR].begin(0x71);
@@ -45,8 +46,8 @@ void setup() {
   playAnimation("test1_", MATRIX_MOUTHL);
   /*Run timeBase every 50 ms*/
   //Timer1.initialize(0.05 * 1000000);
-  Timer1.initialize(5 * 1000000);
-  Timer1.attachInterrupt(timeBase);
+  //Timer1.initialize(5 * 1000000);
+  //Timer1.attachInterrupt(timeBase);
 }
 
 void playAnimation(String name, uint8_t m) {
@@ -55,7 +56,7 @@ void playAnimation(String name, uint8_t m) {
   frame[m] = 0;
 }
 
-void timeBase() {
+void timeBase() {/*
   Serial.println("timebase");
   for(int m = 0; m < 5; m ++) {
     if(!updateMatrix[m]) {
@@ -64,14 +65,14 @@ void timeBase() {
       }
       remainingTime[m] --;
     }
-  }
+  }*/
 }
 
-void loop() {
+void loop() {/*
   for(int m = 0; m < 5; m ++) {
     if(updateMatrix[m]) {
       remainingTime[m] = loadFile(filename[m], frame[m], m);
-      /*File does not exist -> no more frame -> replay animation*/
+      //File does not exist -> no more frame -> replay animation
       if(remainingTime[m] == -1) {
         frame[m] = 0;
         remainingTime[m] = loadFile(filename[m], frame[m], m);
@@ -87,14 +88,15 @@ void loop() {
       updateMatrix[m] = false;
     }
   }
-  /*
-  if (Serial.available() > 0) {
-    if(Serial.read() == '/') {
-      String command = Serial.readStringUntil('\n');
-      Serial.println(command);
-      
+  */
+  if(Serial.available() > 0) {
+    char buf[80];
+    Serial.readBytesUntil('\n', buf, 80);
+    if(String(buf).startsWith("/a")) {
+      Serial.println("A!");
+      Serial.println(String(buf).substring(2, sizeof(buf)));
     }
-  }*/
+  }
 }
 
 /*
