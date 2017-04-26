@@ -16,6 +16,8 @@ int remainingTime[5];
 
 uint8_t frame[5];
 
+bool updateMatrix[5];
+
 File readingFile;
 
 void setup() {
@@ -24,6 +26,7 @@ void setup() {
     filename[i] = "";
     remainingTime[i] = 0;
     frame[i] = 0;
+    updateMatrix[i] = false;
   }
   
   Serial.begin(9600);
@@ -32,21 +35,41 @@ void setup() {
     return;
   }
   /*TODO: assign the rigth numbers*/
-  matrix[MATRIX_EYEL].begin(0x70);
-  matrix[MATRIX_EYER].begin(0x71);
-  matrix[MATRIX_MOUTHL].begin(0x72);
-  matrix[MATRIX_MOUTHM].begin(0x73);
-  matrix[MATRIX_MOUTHR].begin(0x74);
+  matrix[MATRIX_MOUTHL].begin(0x70);
+  matrix[MATRIX_MOUTHR].begin(0x71);
+  matrix[MATRIX_MOUTHM].begin(0x72);
+  matrix[MATRIX_EYER].begin(0x74);
+  matrix[MATRIX_EYEL].begin(0x76);
 
+  playAnimation("test1_", MATRIX_MOUTHM);
+  playAnimation("test1_", MATRIX_MOUTHL);
   /*Run timeBase every 50 ms*/
   //Timer1.initialize(0.05 * 1000000);
-  Timer1.initialize(1 * 1000000);
+  Timer1.initialize(5 * 1000000);
   Timer1.attachInterrupt(timeBase);
 }
 
+void playAnimation(String name, uint8_t m) {
+  filename[m] = name;
+  remainingTime[m] = 0;
+  frame[m] = 0;
+}
+
 void timeBase() {
+  Serial.println("timebase");
   for(int m = 0; m < 5; m ++) {
-    if(remainingTime[m] == 0) {
+    if(!updateMatrix[m]) {
+      if(remainingTime[m] == 0) {
+        updateMatrix[m] = true;
+      }
+      remainingTime[m] --;
+    }
+  }
+}
+
+void loop() {
+  for(int m = 0; m < 5; m ++) {
+    if(updateMatrix[m]) {
       remainingTime[m] = loadFile(filename[m], frame[m], m);
       /*File does not exist -> no more frame -> replay animation*/
       if(remainingTime[m] == -1) {
@@ -60,21 +83,21 @@ void timeBase() {
         }
       }
       frame[m] ++;
+      remainingTime[m] --;
+      updateMatrix[m] = false;
     }
-    remainingTime[m] --;
   }
-}
-
-void loop() {
+  /*
   if (Serial.available() > 0) {
     if(Serial.read() == '/') {
       String command = Serial.readStringUntil('\n');
       Serial.println(command);
       
     }
-  }
+  }*/
 }
 
+/*
 String[] getCommandParts(String cmd, int max) {
   char myArray[cmd.size()+1];//as 1 char space for null is also required
   strcpy(myArray, cmd.c_str());
@@ -82,7 +105,7 @@ String[] getCommandParts(String cmd, int max) {
   while(myArray[]) {
     
   }
-}
+}*/
 
 int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
   readingFile = SD.open(filename + frame + ".txt");
@@ -125,9 +148,8 @@ void drawImage(uint8_t data[], uint8_t m) {
     Serial.println(data[i], BIN);
   }
   Serial.println("-----");
-  /*
   matrix[m].clear();
   matrix[m].drawBitmap(0, 0, data, 8, 8, LED_ON);
-  matrix[m].writeDisplay();*/
+  matrix[m].writeDisplay();
 }
 
