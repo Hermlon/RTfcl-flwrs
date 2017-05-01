@@ -1,4 +1,4 @@
-public struct Frame {
+public class Frame {
 	public int duration;
-	public bool[][] pixels;
+	public bool[,] pixels;
 }
