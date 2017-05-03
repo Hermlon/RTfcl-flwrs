@@ -8,12 +8,11 @@ public class ChooseAnimationGUI : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		BMLParser bmlParser = new BMLParser();
-		Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/left_eye_of_a_cactus.bml");
-		Debug.Log(a1.getName());
-
+		Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/d1_el.bml");
 		ledm = new LEDMatrix();
 		ledm.Init();
 		ledm.playAnimation(a1);
+		Debug.Log(a1.intToBinaryString (12));
 	}
 
 	// Update is called once per frame

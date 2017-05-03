@@ -24,4 +24,31 @@ public class Animation {
 			return null;
 		}
 	}
+	/*
+	public string getByteText(int frame) {
+		string content = "";
+		content += getFrame (frame).duration;
+			
+		getFrame(frame)
+	}*/
+	public string getByteTextFileName(int frame) {
+		return name + "_" + frame + ".txt";
+	}
+
+	public string intToBinaryString(int number)
+	{
+		char[] stringBinaryNumber = {'0','0','0','0','0','0','0','0'};
+		//rest = number;
+		for (int i = 7; i >=0; i--)
+		{
+			if (number <= (2^i)) {
+				number = number - (2^i);
+				stringBinaryNumber[i]='1';
+			}
+			else
+				stringBinaryNumber[i]='0';
+		}
+		return stringBinaryNumber.ToString();//Doesnt work...
+	}
+
 }

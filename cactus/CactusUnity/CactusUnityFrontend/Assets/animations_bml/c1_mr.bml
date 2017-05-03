@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blm width="18" height="8" bits="1" channels="1">
+	<header>
+		<title>right</title>
+		<description>right_piece_of_a_mouth_of_a_cactus</description>
+		<creator>BlinkenPaint 3.14</creator>
+		<author>ICH</author>
+		<email>I&apos;m@home.de</email>
+		<loop>no</loop>
+		<duration>400</duration>
+	</header>
+
+	<frame duration="100">
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000111110000000000</row>
+		<row>111111100000000000</row>
+		<row>111100000000000000</row>
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+	</frame>
+
+	<frame duration="100">
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000111110000000000</row>
+		<row>111111100000000000</row>
+		<row>111110000000000000</row>
+		<row>111000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+	</frame>
+
+	<frame duration="100">
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000111110000000000</row>
+		<row>111100010000000000</row>
+		<row>101001100000000000</row>
+		<row>010111000000000000</row>
+		<row>111100000000000000</row>
+		<row>000000000000000000</row>
+	</frame>
+
+	<frame duration="100">
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000111110000000000</row>
+		<row>111111100000000000</row>
+		<row>111110000000000000</row>
+		<row>111000000000000000</row>
+		<row>000000000000000000</row>
+		<row>000000000000000000</row>
+	</frame>
+</blm>

@@ -1,0 +1,16 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\Animation.cs">
+    <Files>
+      <File FileName="Assets\scripts\Animation.cs" Line="8" Column="22" />
+      <File FileName="Assets\scripts\BMLParser.cs" Line="33" Column="18" />
+      <File FileName="Assets\scripts\ChooseAnimationGUI.cs" Line="15" Column="27" />
+      <File FileName="Assets\scripts\Frame.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\LEDMatrix.cs" Line="28" Column="36" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
