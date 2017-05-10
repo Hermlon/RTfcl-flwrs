@@ -2,6 +2,17 @@
 #include "Adafruit_LEDBackpack.h"
 #include "TimerOne.h"
 #include <SD.h>
+#include <WiFi.h>
+#include <WiFiUdp.h>
+#include <SPI.h>
+
+char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
+char pass[] = "59053491";    // your network key
+unsigned int localPort = 2390;      // local port to listen on
+char packetBuffer[255]; //buffer to hold incoming packet
+char  ReplyBuffer[] = "xxxx";       // a string to send back
+WiFiUDP Udp;
 
 Adafruit_8x8matrix matrix[5];
 const uint8_t MATRIX_EYEL = 0;
@@ -35,19 +46,32 @@ void setup() {
     return;
   }
   Serial.println("Starting...");
-  /*TODO: assign the rigth numbers*/
   matrix[MATRIX_MOUTHL].begin(0x70);
   matrix[MATRIX_MOUTHR].begin(0x71);
   matrix[MATRIX_MOUTHM].begin(0x72);
   matrix[MATRIX_EYER].begin(0x74);
   matrix[MATRIX_EYEL].begin(0x76);
 
-  playAnimation("test1_", MATRIX_MOUTHM);
-  playAnimation("test1_", MATRIX_MOUTHL);
+  //playAnimation("test1_", MATRIX_MOUTHM);
+  //playAnimation("test1_", MATRIX_MOUTHL);
   /*Run timeBase every 50 ms*/
   //Timer1.initialize(0.05 * 1000000);
   //Timer1.initialize(5 * 1000000);
   //Timer1.attachInterrupt(timeBase);
+
+  //Init Wifi
+   while ( status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network:    
+    status = WiFi.begin(ssid, pass);
+
+    // wait 10 seconds for connection:
+    delay(10000);
+  }
+  // you're connected now, so print out the data:
+  Serial.print("You're connected to the network");
+  Udp.begin(localPort);
 }
 
 void playAnimation(String name, uint8_t m) {
@@ -89,6 +113,7 @@ void loop() {/*
     }
   }
   */
+  /*
   if(Serial.available() > 0) {
     char buf[80];
     Serial.readBytesUntil('\n', buf, 80);
@@ -96,18 +121,64 @@ void loop() {/*
       Serial.println("A!");
       Serial.println(String(buf).substring(2, sizeof(buf)));
     }
+  }*/
+  // if there's data available, read a packet
+  int packetSize = Udp.parsePacket();
+  if (packetSize) {
+    // read the packet into packetBufffer
+    int len = Udp.read(packetBuffer, 255);
+    if (len > 0) {
+      packetBuffer[len] = 0;
+    }
+    //Serial.println(packetBuffer);
+    parseCommand(packetBuffer);
   }
 }
 
 /*
-String[] getCommandParts(String cmd, int max) {
-  char myArray[cmd.size()+1];//as 1 char space for null is also required
-  strcpy(myArray, cmd.c_str());
-  String res[max];
-  while(myArray[]) {
-    
+ * Command syntax:
+ * Play animation
+ * /a <filename> <length>
+ *  return <framenr> if frame it doesnt exist.
+ * Send new frame:
+ * /s <filename> <data>
+ */
+void parseCommand(char data[]) {
+  if(String(data).startsWith("/a")) {
+      String filename = splitString(String(data),' ', 1);
+      int animationlength = splitString(String(data),' ', 2).toInt();
+      for(int i = 0; i < animationlength; i ++) {
+        if(!fileExists(filename + i + ".txt")) {
+          //send a reply, to the IP address and port that sent us the packet we received
+          Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+          dtostrf(i,4,0,ReplyBuffer);
+          Udp.write(ReplyBuffer);
+          Udp.endPacket();
+        }
+      }
   }
-}*/
+  if(String(data).startsWith("/s")) {
+    String filename = splitString(String(data),' ', 1);
+    String d = splitString(String(data),' ', 2);
+    Serial.println("Writing file " + filename + " data: " + d);
+  }
+}
+
+String splitString(String data, char separator, int index)
+{
+    int found = 0;
+    int strIndex[] = { 0, -1 };
+    int maxIndex = data.length() - 1;
+
+    for (int i = 0; i <= maxIndex && found <= index; i++) {
+        if (data.charAt(i) == separator || i == maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1] + 1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
+    return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
 
 int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
   readingFile = SD.open(filename + frame + ".txt");
@@ -154,4 +225,60 @@ void drawImage(uint8_t data[], uint8_t m) {
   matrix[m].drawBitmap(0, 0, data, 8, 8, LED_ON);
   matrix[m].writeDisplay();
 }
+
+bool fileExists(String filename) {
+  readingFile = SD.open(filename);
+  if(readingFile) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+//WLAN:
+
+void printMacAddress() {
+  // the MAC address of your Wifi shield
+  byte mac[6];                    
+
+  // print your MAC address:
+  WiFi.macAddress(mac);
+  Serial.print("MAC: ");
+  Serial.print(mac[5],HEX);
+  Serial.print(":");
+  Serial.print(mac[4],HEX);
+  Serial.print(":");
+  Serial.print(mac[3],HEX);
+  Serial.print(":");
+  Serial.print(mac[2],HEX);
+  Serial.print(":");
+  Serial.print(mac[1],HEX);
+  Serial.print(":");
+  Serial.println(mac[0],HEX);
+}
+
+void listNetworks() {
+  // scan for nearby networks:
+  Serial.println("** Scan Networks **");
+  byte numSsid = WiFi.scanNetworks();
+
+  // print the list of networks seen:
+  Serial.print("number of available networks:");
+  Serial.println(numSsid);
+
+  // print the network number and name for each network found:
+  for (int thisNet = 0; thisNet<numSsid; thisNet++) {
+    Serial.print(thisNet);
+    Serial.print(") ");
+    Serial.print(WiFi.SSID(thisNet));
+    Serial.print("\tSignal: ");
+    Serial.print(WiFi.RSSI(thisNet));
+    Serial.print(" dBm");
+    Serial.print("\tEncryption: ");
+    Serial.println(WiFi.encryptionType(thisNet));
+  }
+}
+
+
 
