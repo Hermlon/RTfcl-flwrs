@@ -55,9 +55,9 @@ void setup() {
   //playAnimation("test1_", MATRIX_MOUTHM);
   //playAnimation("test1_", MATRIX_MOUTHL);
   /*Run timeBase every 50 ms*/
-  //Timer1.initialize(0.05 * 1000000);
+  Timer1.initialize(0.05 * 1000000);
   //Timer1.initialize(5 * 1000000);
-  //Timer1.attachInterrupt(timeBase);
+  Timer1.attachInterrupt(timeBase);
 
   //Init Wifi
    while ( status != WL_CONNECTED) {
@@ -70,7 +70,7 @@ void setup() {
     delay(10000);
   }
   // you're connected now, so print out the data:
-  Serial.print("You're connected to the network");
+  Serial.println("You're connected to the network");
   Udp.begin(localPort);
 }
 
@@ -80,8 +80,7 @@ void playAnimation(String name, uint8_t m) {
   frame[m] = 0;
 }
 
-void timeBase() {/*
-  Serial.println("timebase");
+void timeBase() {
   for(int m = 0; m < 5; m ++) {
     if(!updateMatrix[m]) {
       if(remainingTime[m] == 0) {
@@ -89,10 +88,10 @@ void timeBase() {/*
       }
       remainingTime[m] --;
     }
-  }*/
+  }
 }
 
-void loop() {/*
+void loop() {
   for(int m = 0; m < 5; m ++) {
     if(updateMatrix[m]) {
       remainingTime[m] = loadFile(filename[m], frame[m], m);
@@ -112,7 +111,7 @@ void loop() {/*
       updateMatrix[m] = false;
     }
   }
-  */
+  
   /*
   if(Serial.available() > 0) {
     char buf[80];
@@ -138,7 +137,7 @@ void loop() {/*
 /*
  * Command syntax:
  * Play animation
- * /a <filename> <length>
+ * /a <filename> <length> <matrix>
  *  return <framenr> if frame it doesnt exist.
  * Send new frame:
  * /s <filename> <data>
@@ -147,20 +146,34 @@ void parseCommand(char data[]) {
   if(String(data).startsWith("/a")) {
       String filename = splitString(String(data),' ', 1);
       int animationlength = splitString(String(data),' ', 2).toInt();
+      int matrixindex = splitString(String(data),' ', 3).toInt();
+      bool incomplete = false;
       for(int i = 0; i < animationlength; i ++) {
         if(!fileExists(filename + i + ".txt")) {
+          incomplete = true;
+          Serial.println("Frame " + String(i) + " of animation " + filename + "does not exist!");
           //send a reply, to the IP address and port that sent us the packet we received
           Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
           dtostrf(i,4,0,ReplyBuffer);
           Udp.write(ReplyBuffer);
+          Serial.println("Wrote: " + String(ReplyBuffer) + "to " + Udp.remoteIP());
           Udp.endPacket();
         }
+      }
+      if(!incomplete) {
+        playAnimation(filename, matrixindex);
       }
   }
   if(String(data).startsWith("/s")) {
     String filename = splitString(String(data),' ', 1);
     String d = splitString(String(data),' ', 2);
-    Serial.println("Writing file " + filename + " data: " + d);
+    if(d.length() == 72) {
+        Serial.println("Writing file " + filename + " data: " + d);
+        writeFile(filename, d);
+    }
+    else {
+      Serial.println("Invalid data length (" + String(d.length()) + ": " + filename + " | " + d);
+    }
   }
 }
 
@@ -215,6 +228,18 @@ int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
   }
 }
 
+void writeFile(String name, String data) {
+  SD.remove(name);
+  readingFile = SD.open(name, FILE_WRITE);
+  if (readingFile) {
+    readingFile.println(data);
+    readingFile.close();
+    Serial.println("Successfully wrote file: " + name);
+  } else {
+    Serial.println("error opening " + name);
+  }
+}
+
 void drawImage(uint8_t data[], uint8_t m) {
   Serial.println("-----");
   for(int i = 0; i < 8; i ++) {
@@ -233,50 +258,6 @@ bool fileExists(String filename) {
   }
   else {
     return false;
-  }
-}
-
-//WLAN:
-
-void printMacAddress() {
-  // the MAC address of your Wifi shield
-  byte mac[6];                    
-
-  // print your MAC address:
-  WiFi.macAddress(mac);
-  Serial.print("MAC: ");
-  Serial.print(mac[5],HEX);
-  Serial.print(":");
-  Serial.print(mac[4],HEX);
-  Serial.print(":");
-  Serial.print(mac[3],HEX);
-  Serial.print(":");
-  Serial.print(mac[2],HEX);
-  Serial.print(":");
-  Serial.print(mac[1],HEX);
-  Serial.print(":");
-  Serial.println(mac[0],HEX);
-}
-
-void listNetworks() {
-  // scan for nearby networks:
-  Serial.println("** Scan Networks **");
-  byte numSsid = WiFi.scanNetworks();
-
-  // print the list of networks seen:
-  Serial.print("number of available networks:");
-  Serial.println(numSsid);
-
-  // print the network number and name for each network found:
-  for (int thisNet = 0; thisNet<numSsid; thisNet++) {
-    Serial.print(thisNet);
-    Serial.print(") ");
-    Serial.print(WiFi.SSID(thisNet));
-    Serial.print("\tSignal: ");
-    Serial.print(WiFi.RSSI(thisNet));
-    Serial.print(" dBm");
-    Serial.print("\tEncryption: ");
-    Serial.println(WiFi.encryptionType(thisNet));
   }
 }
 
