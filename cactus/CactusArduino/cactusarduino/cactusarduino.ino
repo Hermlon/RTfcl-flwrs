@@ -160,6 +160,11 @@ void parseCommand(char data[]) {
           Udp.endPacket();
         }
       }
+      //Send end signal
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      dtostrf('e',4,0,ReplyBuffer);
+      Udp.write(ReplyBuffer);
+          
       if(!incomplete) {
         playAnimation(filename, matrixindex);
       }

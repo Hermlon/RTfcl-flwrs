@@ -17,7 +17,7 @@ public class UDPSender {
 
 	Thread receiveThread;
 	public string lastReceivedUDPPacket="";
-	public string allReceivedUDPPackets=""; 
+	public string allReceivedUDPPackets="";
 
 	public UDPSender (string i, int p, ChooseAnimationGUI listener) {
 		ip = i;
@@ -47,7 +47,7 @@ public class UDPSender {
 
 				// Bytes mit der UTF8-Kodierung in das Textformat kodieren.
 				string text = Encoding.UTF8.GetString(data);
-				
+
 			}
 			catch (Exception err)
 			{

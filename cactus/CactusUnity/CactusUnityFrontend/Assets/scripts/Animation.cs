@@ -12,6 +12,10 @@ public class Animation {
     return this.name;
   }
 
+	public int getSize() {
+		return frames.Count;
+	}
+
   public void addFrame(Frame frame) {
     this.frames.Add(frame);
   }
@@ -28,7 +32,7 @@ public class Animation {
 	public string getByteText(int frame) {
 		string content = "";
 		content += getFrame (frame).duration;
-			
+
 		getFrame(frame)
 	}*/
 	public string getByteTextFileName(int frame) {
