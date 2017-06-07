@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using UnityEngine;
+using System.Collections;
+using System;
 
 public class Animation {
 	private string name;
@@ -28,19 +31,30 @@ public class Animation {
 			return null;
 		}
 	}
-	/*
-	public string getByteText(int frame) {
-		string content = "";
-		content += getFrame (frame).duration;
 
-		getFrame(frame)
-	}*/
+	public string getByteText(int frame) {
+		Frame f = getFrame (frame);
+		string content = "";
+		content += intToBinaryString(f.duration);
+		Debug.Log ("Duration: " + content);
+		for (int y = 0; y < 8; y++) {
+			for(int x = 0; x < 8; x ++) {
+				if (f.pixels [y, x]) {
+					content += "1";
+				} else {
+					content += "0";
+				}
+			}
+		}
+		return content;
+	}
 	public string getByteTextFileName(int frame) {
-		return name + "_" + frame + ".txt";
+		return name + frame + ".txt";
 	}
 
 	public string intToBinaryString(int number)
 	{
+		/*
 		char[] stringBinaryNumber = {'0','0','0','0','0','0','0','0'};
 		//rest = number;
 		for (int i = 7; i >=0; i--)
@@ -52,7 +66,14 @@ public class Animation {
 			else
 				stringBinaryNumber[i]='0';
 		}
-		return stringBinaryNumber.ToString();//Doesnt work...
+		return new string (stringBinaryNumber);*/
+		string r = "";
+		string res = Convert.ToString (number, 2);
+		int m = 8 - res.Length;
+		for (int t = 0; t < m; t++) {
+			r += "0";
+		}
+		return r +res;
 	}
 
 }

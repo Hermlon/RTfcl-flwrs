@@ -1,5 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Text;
+using System.Net;
+using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Threading;
 
 public class AnimationUDPManager {
 
@@ -11,29 +17,34 @@ public class AnimationUDPManager {
 
 	private Thread receiveThread;
 
-  private int MATRIX_EYEL = 0;
-  private int MATRIX_EYER = 1;
-  private int MATRIX_MOUTHL = 2;
-  private int MATRIX_MOUTHM = 3;
-  private int MATRIX_MOUTHR = 4;
+  	public static int MATRIX_EYEL = 0;
+	public static int MATRIX_EYER = 1;
+	public static int MATRIX_MOUTHL = 2;
+	public static int MATRIX_MOUTHM = 3;
+	public static int MATRIX_MOUTHR = 4;
+
+	private Animation currentAnimation;
+	private int currentMatrix;
+	private int tries = 0;
 
   public AnimationUDPManager(string i, int p) {
     ip = i;
     port = p;
     remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
-		client = new UdpClient();
+	client = new UdpClient();
   }
 
-  public void playAnimation(Animation a, int matrix) {
+  public void playAnimation(Animation a, int m) {
     // /a <filename> <length> <matrix>
-    // /s <filename> <data>
-    string filename = a.getName();
+	currentAnimation = a;
+		currentMatrix = m;
+	string filename = a.getName();
     string length = a.getSize().ToString();
-    string matrix = matrix.ToString();
-    SendMsg("/a " + filename + " " + length + " " + matrix);
+    string matrix = m.ToString();
+	SendMsgAndReceive("/a " + filename + " " + length + " " + matrix);
   }
 
-  public void SendMsg(string msg) {
+	public void SendMsgAndReceive(string msg) {
 		byte[] data = Encoding.UTF8.GetBytes(msg);
 		client.Send(data, data.Length, remoteEndPoint);
 		receiveThread = new Thread(new ThreadStart(ReceiveData));
@@ -41,8 +52,13 @@ public class AnimationUDPManager {
 		receiveThread.Start();
 	}
 
+  public void SendMsg(string msg) {
+		byte[] data = Encoding.UTF8.GetBytes(msg);
+		client.Send(data, data.Length, remoteEndPoint);
+	}
+
 	private void ReceiveData() {
-    List<int> missingFrames = new List<>();
+    List<int> missingFrames = new List<int>();
 		while (true)
 		{
 			try
@@ -53,9 +69,11 @@ public class AnimationUDPManager {
 
 				// Bytes mit der UTF8-Kodierung in das Textformat kodieren.
 				string text = Encoding.UTF8.GetString(data);
+				Debug.Log("Received: " + text);
 
         //Everything received
-        if(text == "e") {
+        if(text == "xend") {
+			Debug.Log("End flag received.");
           sendMissingFrames(missingFrames);
           return;
         }
@@ -64,7 +82,7 @@ public class AnimationUDPManager {
             int f = Convert.ToInt32(text);
             missingFrames.Add(f);
           }
-          catch(Exceprion e) {
+          catch(Exception e) {
 
           }
         }
@@ -77,6 +95,16 @@ public class AnimationUDPManager {
 	}
 
   private void sendMissingFrames(List<int> mf) {
-//foreach send file...
+		foreach (int i in mf) {
+			// /s <filename> <data>
+			string filename = currentAnimation.getByteTextFileName(i);
+			string data = currentAnimation.getByteText (i);
+			Debug.Log ("Sending missinf file: " + filename + "(" + data + ")" );
+			SendMsg("/s " + filename + " " + data);
+		}
+		if (tries == 0) {
+			playAnimation (currentAnimation, currentMatrix);
+			tries++;
+		}
   }
 }
