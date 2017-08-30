@@ -13,7 +13,8 @@ public class ChooseAnimationGUI : MonoBehaviour {
 		ledm.Init();
 		ledm.playAnimation(a1);
 		Debug.Log(a1.intToBinaryString (12));*/
-		AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.100", 2390);
+		//AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.100", 2390);
+		AnimationUDPManager udp = new AnimationUDPManager ("192.168.1.62", 2390);
 		udp.playAnimation (a1, AnimationUDPManager.MATRIX_EYER);
 	}
 

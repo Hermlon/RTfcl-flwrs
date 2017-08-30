@@ -37,11 +37,12 @@ public class AnimationUDPManager {
   public void playAnimation(Animation a, int m) {
     // /a <filename> <length> <matrix>
 	currentAnimation = a;
-		currentMatrix = m;
+	currentMatrix = m;
 	string filename = a.getName();
     string length = a.getSize().ToString();
     string matrix = m.ToString();
-	SendMsgAndReceive("/a " + filename + " " + length + " " + matrix);
+	//SendMsgAndReceive("/a " + filename + " " + length + " " + matrix);
+	SendMsg("/a " + filename + " " + length + " " + matrix);
   }
 
 	public void SendMsgAndReceive(string msg) {

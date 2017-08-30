@@ -30,10 +30,10 @@ public class UDPSender {
 	public void SendMsg(string msg) {
 		byte[] data = Encoding.UTF8.GetBytes(msg);
 		client.Send(data, data.Length, remoteEndPoint);
-		receiveThread = new Thread(
+		/*receiveThread = new Thread(
 			new ThreadStart(ReceiveData));
 		receiveThread.IsBackground = true;
-		receiveThread.Start();
+		receiveThread.Start();*/
 	}
 
 	private void ReceiveData() {
@@ -47,7 +47,7 @@ public class UDPSender {
 
 				// Bytes mit der UTF8-Kodierung in das Textformat kodieren.
 				string text = Encoding.UTF8.GetString(data);
-
+				Debug.Log(text);
 			}
 			catch (Exception err)
 			{
