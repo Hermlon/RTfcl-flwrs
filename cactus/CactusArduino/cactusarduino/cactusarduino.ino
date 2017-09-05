@@ -4,15 +4,28 @@
 #include <SD.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
+#include <Ethernet.h>
+#include <EthernetUdp.h>
 #include <SPI.h>
 
+// Wifi only:
 char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 char pass[] = "59053491";    // your network key
+//WiFiUDP Udp;
+
+//Ethernet only:
+// Enter a MAC address and IP address for your controller below.
+// The IP address will be dependent on your local network:
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+IPAddress ip(10, 0, 0, 105);
+EthernetUDP Udp;
+
 unsigned int localPort = 2390;      // local port to listen on
-char packetBuffer[255]; //buffer to hold incoming packet
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 char  ReplyBuffer[] = "xxxx";       // a string to send back
-WiFiUDP Udp;
 
 Adafruit_8x8matrix matrix[5];
 const uint8_t MATRIX_EYEL = 0;
@@ -56,9 +69,14 @@ void setup() {
   //playAnimation("test1_", MATRIX_MOUTHL);
   /*Run timeBase every 50 ms*/
   Timer1.initialize(0.05 * 1000000);
-  //Timer1.initialize(5 * 1000000);
   Timer1.attachInterrupt(timeBase);
 
+  //initWifi();
+  initEthernet();
+  Udp.begin(localPort);
+}
+
+void initWifi() {
   //Init Wifi
    while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to WPA SSID: ");
@@ -69,9 +87,12 @@ void setup() {
     // wait 10 seconds for connection:
     delay(10000);
   }
-  // you're connected now, so print out the data:
-  Serial.println("You're connected to the network");
-  Udp.begin(localPort);
+  Serial.println("You're connected to the network via wlan");
+}
+
+void initEthernet() {
+   Ethernet.begin(mac, ip);
+   Serial.println("You're connected to the network via ethernet");
 }
 
 void playAnimation(String name, uint8_t m) {
@@ -129,7 +150,8 @@ void loop() {
     if (len > 0) {
       packetBuffer[len] = 0;
     }
-    //Serial.println(packetBuffer);
+    Serial.print("New Package: ");
+    Serial.println(packetBuffer);
     parseCommand(packetBuffer);
   }
 }
