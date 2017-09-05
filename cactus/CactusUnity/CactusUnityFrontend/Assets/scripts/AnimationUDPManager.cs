@@ -41,8 +41,8 @@ public class AnimationUDPManager {
 	string filename = a.getName();
     string length = a.getSize().ToString();
     string matrix = m.ToString();
-	//SendMsgAndReceive("/a " + filename + " " + length + " " + matrix);
-	SendMsg("/a " + filename + " " + length + " " + matrix);
+	SendMsgAndReceive("/a " + filename + " " + length + " " + matrix);
+	//SendMsg("/a " + filename + " " + length + " " + matrix);
   }
 
 	public void SendMsgAndReceive(string msg) {
