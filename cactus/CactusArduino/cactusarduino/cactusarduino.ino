@@ -9,10 +9,11 @@
 #include <SPI.h>
 
 // Wifi only:
-char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
+//char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
+char ssid[] = "dlink";
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 char pass[] = "59053491";    // your network key
-//WiFiUDP Udp;
+WiFiUDP Udp;
 
 //Ethernet only:
 // Enter a MAC address and IP address for your controller below.
@@ -21,7 +22,7 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 IPAddress ip(10, 0, 0, 105);
-EthernetUDP Udp;
+//EthernetUDP Udp;
 
 unsigned int localPort = 2390;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
@@ -71,8 +72,8 @@ void setup() {
   Timer1.initialize(0.05 * 1000000);
   Timer1.attachInterrupt(timeBase);
 
-  //initWifi();
-  initEthernet();
+  initWifi();
+  //initEthernet();
   Udp.begin(localPort);
 }
 
@@ -82,12 +83,13 @@ void initWifi() {
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network:    
-    status = WiFi.begin(ssid, pass);
-
+   // status = WiFi.begin(ssid, pass);
+status = WiFi.begin(ssid);
     // wait 10 seconds for connection:
     delay(10000);
   }
-  Serial.println("You're connected to the network via wlan");
+  Serial.print(WiFi.localIP());
+  Serial.println(": You're connected to the network via wlan");
 }
 
 void initEthernet() {
@@ -173,12 +175,12 @@ void parseCommand(char data[]) {
       for(int i = 0; i < animationlength; i ++) {
         if(!fileExists(filename + i + ".txt")) {
           incomplete = true;
-          Serial.println("Frame " + String(i) + " of animation " + filename + "does not exist!");
+          Serial.println("Frame " + String(i) + " of animation " + filename + " does not exist!");
           //send a reply, to the IP address and port that sent us the packet we received
           Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
           dtostrf(i,4,0,ReplyBuffer);
           Udp.write(ReplyBuffer);
-          Serial.println("Wrote: " + String(ReplyBuffer) + "to " + Udp.remoteIP());
+          Serial.println("Wrote: " + String(ReplyBuffer) + " to "); printRemoteInfo();
           Udp.endPacket();
         }
       }
@@ -267,12 +269,12 @@ void writeFile(String name, String data) {
   }
 }
 
-void drawImage(uint8_t data[], uint8_t m) {
+void drawImage(uint8_t data[], uint8_t m) {/*
   Serial.println("-----");
   for(int i = 0; i < 8; i ++) {
     Serial.println(data[i], BIN);
   }
-  Serial.println("-----");
+  Serial.println("-----");*/
   matrix[m].clear();
   matrix[m].drawBitmap(0, 0, data, 8, 8, LED_ON);
   matrix[m].writeDisplay();
@@ -286,6 +288,18 @@ bool fileExists(String filename) {
   else {
     return false;
   }
+}
+
+void printRemoteInfo() {
+  IPAddress remote = Udp.remoteIP();
+  for (int i = 0; i < 4; i++) {
+      Serial.print(remote[i], DEC);
+      if (i < 3) {
+        Serial.print(".");
+      }
+    }
+    Serial.print(", port ");
+    Serial.println(Udp.remotePort());
 }
 
 
