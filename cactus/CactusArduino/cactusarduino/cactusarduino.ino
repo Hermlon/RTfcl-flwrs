@@ -186,8 +186,13 @@ void parseCommand(char data[]) {
       }
       //Send end signal
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      dtostrf('e',4,0,ReplyBuffer);
+      ReplyBuffer[0] = 'x';
+      ReplyBuffer[1] = 'e';
+      ReplyBuffer[2] = 'n';
+      ReplyBuffer[3] = 'd';
       Udp.write(ReplyBuffer);
+      Serial.println("Wrote: " + String(ReplyBuffer) + " to "); printRemoteInfo();
+      Udp.endPacket();
           
       if(!incomplete) {
         playAnimation(filename, matrixindex);

@@ -35,6 +35,7 @@ public class AnimationUDPManager {
   }
 
   public void playAnimation(Animation a, int m) {
+	Debug.Log ("Playing animation " + a.getName() + "on " + m);
     // /a <filename> <length> <matrix>
 	currentAnimation = a;
 	currentMatrix = m;
@@ -48,6 +49,7 @@ public class AnimationUDPManager {
 	public void SendMsgAndReceive(string msg) {
 		byte[] data = Encoding.UTF8.GetBytes(msg);
 		client.Send(data, data.Length, remoteEndPoint);
+		Debug.Log ("Receiving");
 		receiveThread = new Thread(new ThreadStart(ReceiveData));
 		receiveThread.IsBackground = true;
 		receiveThread.Start();
@@ -62,6 +64,7 @@ public class AnimationUDPManager {
     List<int> missingFrames = new List<int>();
 		while (true)
 		{
+			
 			try
 			{
 				// Bytes empfangen.
@@ -72,21 +75,20 @@ public class AnimationUDPManager {
 				string text = Encoding.UTF8.GetString(data);
 				Debug.Log("Received: " + text);
 
-        //Everything received
-        if(text == "xend") {
-			Debug.Log("End flag received.");
-          sendMissingFrames(missingFrames);
-          return;
-        }
-        else {
-          try {
-            int f = Convert.ToInt32(text);
-            missingFrames.Add(f);
-          }
-          catch(Exception e) {
-
-          }
-        }
+        		//Everything received
+        		if(text == "xend") {
+					Debug.Log("End flag received.");
+        		  	sendMissingFrames(missingFrames);
+       			   return;
+     		   	}
+       		 	else {
+        		 	try {
+         		  	 	int f = Convert.ToInt32(text);
+         		  	 	missingFrames.Add(f);
+         			 	}
+         			 	catch(Exception e) {
+         		 	}
+       			}
 			}
 			catch (Exception err)
 			{
