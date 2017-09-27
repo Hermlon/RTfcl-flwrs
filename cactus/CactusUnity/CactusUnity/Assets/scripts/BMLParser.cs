@@ -11,8 +11,7 @@ public class BMLParser {
 		XmlNode root = doc.DocumentElement;
 		XmlNode header = root.SelectSingleNode("header");
 		XmlNode title = header.SelectSingleNode("title");
-		a.setName(title.InnerText);
-		Debug.Log (title.InnerText);
+		a.setName(title.InnerText.Remove(title.InnerText.Length - 1));
 
 		XmlNodeList nodeList = root.SelectNodes ("frame");
 		foreach (XmlNode node in nodeList) {
