@@ -9,10 +9,10 @@ using System.Threading;
 
 public class AnimationUDPManager {
 
-  private string ip;
-	private int port;
+ 	private string ip;
+  	private int port;
 
-  private IPEndPoint remoteEndPoint;
+ 	private IPEndPoint remoteEndPoint;
 	private UdpClient client;
 
 	private Thread receiveThread;
@@ -25,7 +25,6 @@ public class AnimationUDPManager {
 
 	private Animation currentAnimation;
 	private int currentMatrix;
-	private int tries = 0;
 
   public AnimationUDPManager(string i, int p) {
     ip = i;
@@ -35,7 +34,7 @@ public class AnimationUDPManager {
   }
 
   public void playAnimation(Animation a, int m) {
-	Debug.Log ("Playing animation " + a.getName() + "on " + m);
+	Debug.Log ("Playing animation " + a.getName() + " on " + m);
     // /a <filename> <length> <matrix>
 	currentAnimation = a;
 	currentMatrix = m;
@@ -62,9 +61,9 @@ public class AnimationUDPManager {
 
 	private void ReceiveData() {
     List<int> missingFrames = new List<int>();
+		Debug.Log ("Started");
 		while (true)
 		{
-			
 			try
 			{
 				// Bytes empfangen.
@@ -79,6 +78,8 @@ public class AnimationUDPManager {
         		if(text == "xend") {
 					Debug.Log("End flag received.");
         		  	sendMissingFrames(missingFrames);
+					Debug.Log ("Ended");
+					client.Close();
        			   return;
      		   	}
        		 	else {
@@ -89,11 +90,14 @@ public class AnimationUDPManager {
          			 	catch(Exception e) {
          		 	}
        			}
+				client.Close();
 			}
 			catch (Exception err)
 			{
 				//print(err.ToString());
+				Debug.Log ("Error");
 			}
+
 		}
 	}
 
@@ -102,12 +106,9 @@ public class AnimationUDPManager {
 			// /s <filename> <data>
 			string filename = currentAnimation.getByteTextFileName(i);
 			string data = currentAnimation.getByteText (i);
-			Debug.Log ("Sending missinf file: " + filename + "(" + data + ")" );
+			Debug.Log ("Sending missing file: " + filename + "(" + data + ")" );
 			SendMsg("/s " + filename + " " + data);
 		}
-		if (tries == 0) {
-			playAnimation (currentAnimation, currentMatrix);
-			tries++;
-		}
+		playAnimation (currentAnimation, currentMatrix);
   }
 }

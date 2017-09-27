@@ -36,7 +36,6 @@ public class Animation {
 		Frame f = getFrame (frame);
 		string content = "";
 		content += intToBinaryString(f.duration);
-		Debug.Log ("Duration: " + content);
 		for (int y = 0; y < 8; y++) {
 			for(int x = 0; x < 8; x ++) {
 				if (f.pixels [y, x]) {

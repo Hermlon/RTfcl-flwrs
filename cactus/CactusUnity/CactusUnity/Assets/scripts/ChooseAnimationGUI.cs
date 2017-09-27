@@ -8,7 +8,7 @@ public class ChooseAnimationGUI : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		BMLParser bmlParser = new BMLParser();
-		Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/c1_mr.bml");/*
+		Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/b1_el.bml");/*
 		ledm = new LEDMatrix();
 		ledm.Init();
 		ledm.playAnimation(a1);
