@@ -22,6 +22,7 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 IPAddress ip(10, 0, 0, 105);
+int sendingport = 56697;
 //EthernetUDP Udp;
 
 unsigned int localPort = 2390;      // local port to listen on
@@ -177,7 +178,7 @@ void parseCommand(char data[]) {
           incomplete = true;
           Serial.println("Frame " + String(i) + " of animation " + filename + " does not exist!");
           //send a reply, to the IP address and port that sent us the packet we received
-          Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+          Udp.beginPacket(Udp.remoteIP(), sendingport);
           dtostrf(i,4,0,ReplyBuffer);
           Udp.write(ReplyBuffer);
           Serial.println("Wrote: " + String(ReplyBuffer) + " to "); printRemoteInfo();
@@ -185,7 +186,7 @@ void parseCommand(char data[]) {
         }
       }
       //Send end signal
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.beginPacket(Udp.remoteIP(),sendingport);
       ReplyBuffer[0] = 'x';
       ReplyBuffer[1] = 'e';
       ReplyBuffer[2] = 'n';

@@ -11,8 +11,12 @@ public class AnimationUDPManager {
 
  	private string ip;
   	private int port;
+	private int receiveport = 56697;
 
  	private IPEndPoint remoteEndPoint;
+	public static bool messageSent = false;
+	public static bool messageReceived = false;
+
 	private UdpClient client;
 
   	public static int MATRIX_EYEL = 0;
@@ -46,45 +50,86 @@ public class AnimationUDPManager {
 
 	public void SendMsgAndReceive(string msg) {
 		SendMsg (msg);
-		Debug.Log ("Receiving");
-		try
-		{
-			client.BeginReceive(new AsyncCallback(ReceiveData), null);
-		}
-		catch(Exception e)
-		{
-			Debug.Log(e.ToString());
-		}
+		ReceiveData();
 	}
 
  	public void SendMsg(string msg) {
-		byte[] data = Encoding.UTF8.GetBytes(msg);
-		client.Send(data, data.Length, remoteEndPoint);
+		// create the udp socket
+		UdpClient u = new UdpClient();
+
+		u.Connect(remoteEndPoint);
+		Byte [] sendBytes = Encoding.ASCII.GetBytes(msg);
+
+		// send the message
+		// the destination is defined by the call to .Connect()
+		u.BeginSend(sendBytes, sendBytes.Length, 
+			new AsyncCallback(SendCallback), u);
+
+		// Do some work while we wait for the send to complete. For 
+		// this example, we'll just sleep
+		/*
+		while (!messageSent)
+		{
+			Thread.Sleep(100);
+		}*/
 	}
 
-	private void ReceiveData(IAsyncResult res) {
-		IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-		byte[] received = client.EndReceive(res, ref RemoteIpEndPoint);
-		// Bytes mit der UTF8-Kodierung in das Textformat kodieren.
-		string text = Encoding.UTF8.GetString(received);
+	public void SendCallback(IAsyncResult ar)
+	{
+		UdpClient u = (UdpClient)ar.AsyncState;
+
+		Console.WriteLine("number of bytes sent: {0}", u.EndSend(ar));
+		messageSent = true;
+	}
+
+	public void ReceiveCallback(IAsyncResult ar)
+	{
+		UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).u;
+		IPEndPoint e = (IPEndPoint)((UdpState)(ar.AsyncState)).e;
+
+		Byte[] receiveBytes = u.EndReceive(ar, ref e);
+		string text = Encoding.ASCII.GetString(receiveBytes);
+
 		Debug.Log("Received: " + text);
 
-       	//Everything received
-       	if(text == "xend") {
+		//Everything received
+		if(text == "xend") {
 			Debug.Log("End flag received.");
 			//client.Close ();
-       	  	sendMissingFrames();
-      	}
-       	else {
-        	try {
-         		int f = Convert.ToInt32(text);
-         		missingFrames.Add(f);
+			//sendMissingFrames();
+			SendMsg ("Test Message");
+		}
+		else {
+			try {
+				int f = Convert.ToInt32(text);
+				missingFrames.Add(f);
 				//Debug.Log(f);
-         	}
-         	catch(Exception e) {
-          	}
-			client.BeginReceive(new AsyncCallback(ReceiveData), null);
-       	}
+			}
+			catch(Exception egg) {
+			}
+			ReceiveData();
+		}
+		messageReceived = true;
+	}
+
+	private void ReceiveData() {
+		Debug.Log ("Receiving");
+		IPEndPoint e = new IPEndPoint(IPAddress.Any, receiveport);
+		UdpClient u = new UdpClient(e);
+
+		UdpState s = new UdpState();
+		s.e = e;
+		s.u = u;
+
+		Debug.Log("listening for messages");
+		u.BeginReceive(new AsyncCallback(ReceiveCallback), s);
+
+		// Do some work while we wait for a message. For this example,
+		// we'll just sleep
+		while (!messageReceived)
+		{
+			Thread.Sleep(100);
+		}
 	}
 
 	private void sendMissingFrames() {
@@ -98,4 +143,18 @@ public class AnimationUDPManager {
 		missingFrames.Clear ();
 		//playAnimation (currentAnimation, currentMatrix);
   }
+}
+
+public class UdpState
+
+{
+
+
+
+	public IPEndPoint e ;
+
+
+
+	public UdpClient u ;
+
 }

@@ -16,6 +16,7 @@ public class ChooseAnimationGUI : MonoBehaviour {
 		//AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.100", 2390);
 		AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.125", 2390);
 		udp.playAnimation (a1, AnimationUDPManager.MATRIX_EYER);
+		//udp.SendMsg("drfpighfhj");
 	}
 
 	// Update is called once per frame
