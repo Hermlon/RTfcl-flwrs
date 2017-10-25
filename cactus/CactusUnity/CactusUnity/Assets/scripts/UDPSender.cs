@@ -15,11 +15,7 @@ public class UDPSender {
 	IPEndPoint remoteEndPoint;
 	UdpClient client;
 
-	Thread receiveThread;
-	public string lastReceivedUDPPacket="";
-	public string allReceivedUDPPackets="";
-
-	public UDPSender (string i, int p, ChooseAnimationGUI listener) {
+	public UDPSender (string i, int p) {
 		ip = i;
 		port = p;
 		remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
@@ -30,30 +26,6 @@ public class UDPSender {
 	public void SendMsg(string msg) {
 		byte[] data = Encoding.UTF8.GetBytes(msg);
 		client.Send(data, data.Length, remoteEndPoint);
-		/*receiveThread = new Thread(
-			new ThreadStart(ReceiveData));
-		receiveThread.IsBackground = true;
-		receiveThread.Start();*/
 	}
 
-	private void ReceiveData() {
-		while (true)
-		{
-			try
-			{
-				// Bytes empfangen.
-				IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
-				byte[] data = client.Receive(ref anyIP);
-
-				// Bytes mit der UTF8-Kodierung in das Textformat kodieren.
-				string text = Encoding.UTF8.GetString(data);
-				Debug.Log(text);
-			}
-			catch (Exception err)
-			{
-				//print(err.ToString());
-			}
-		}
-
-	}
 }

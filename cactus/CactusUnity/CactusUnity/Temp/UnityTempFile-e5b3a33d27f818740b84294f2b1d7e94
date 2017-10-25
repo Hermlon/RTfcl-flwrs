@@ -101,6 +101,7 @@ Assets/scripts/BMLParser.cs
 Assets/scripts/ChooseAnimationGUI.cs
 Assets/scripts/Frame.cs
 Assets/scripts/LEDMatrix.cs
+Assets/scripts/UDPReceiver.cs
 Assets/scripts/UDPSender.cs
 -r:"C:\Program Files\Unity\Editor\Data\Mono\lib\mono\unity\System.Runtime.Serialization.dll"
 -r:"C:\Program Files\Unity\Editor\Data\Mono\lib\mono\unity\System.Xml.Linq.dll"

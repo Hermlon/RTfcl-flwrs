@@ -57,6 +57,7 @@
      <Compile Include="Assets\scripts\ChooseAnimationGUI.cs" />
      <Compile Include="Assets\scripts\Frame.cs" />
      <Compile Include="Assets\scripts\LEDMatrix.cs" />
+     <Compile Include="Assets\scripts\UDPReceiver.cs" />
      <Compile Include="Assets\scripts\UDPSender.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
