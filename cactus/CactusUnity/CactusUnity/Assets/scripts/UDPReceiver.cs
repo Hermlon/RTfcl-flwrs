@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Text;
 using System;
 
-public class UDPReceiver : MonoBehaviour {
+public class UDPReceiver {
 
 	private int port;
 	private Thread receiveThread;
@@ -24,7 +24,6 @@ public class UDPReceiver : MonoBehaviour {
 
 	public void init()
 	{
-		Debug.Log ("Init");
 		port = 8051;
 		receiveThread = new Thread(new ThreadStart(ReceiveData));
 		receiveThread.IsBackground = true;
@@ -34,7 +33,6 @@ public class UDPReceiver : MonoBehaviour {
 
 	private  void ReceiveData() 
 	{
-		Debug.Log ("Init Thread");
 		client = new UdpClient(port);
 		while (true) 
 		{
@@ -81,10 +79,13 @@ public class UDPReceiver : MonoBehaviour {
 
 	void OnApplicationQuit()
 	{ 
-		Console.WriteLine ("Shutdown!!!");
-		Debug.Log ("SHutdown");
-		if ( receiveThread!= null) 
-			receiveThread.Abort(); 
-		client.Close(); 
+		quit ();
 	} 
+
+	public void quit() {
+		if (receiveThread != null) {
+			receiveThread.Abort (); 
+		}
+		client.Close(); 
+	}
 }

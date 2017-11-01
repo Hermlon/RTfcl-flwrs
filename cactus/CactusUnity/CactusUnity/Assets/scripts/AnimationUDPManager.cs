@@ -21,6 +21,7 @@ public class AnimationUDPManager {
 	private Animation currentAnimation;
 	private int currentMatrix;
 	private ArrayList missingFrames = new ArrayList();
+	private int lastsend;
 
 	private UDPReceiver udpR;
 	private UDPSender udpS;
@@ -50,32 +51,46 @@ public class AnimationUDPManager {
 		Debug.Log("Received: " + text);
 
 		//Everything received
-		if(text == "xend") {
+		if(text == "/e") {
 			Debug.Log("End flag received.");
-			//sendMissingFrames();
-			udpS.SendMsg("Thx for your message!");
-			Debug.Log (missingFrames);
+			lastsend = 0;
+			sendMissingFrame(lastsend);
 		}
-		else {
+		//get missing frame (/g x)
+		if (text.Contains("/g")) {
 			try {
-				int f = Convert.ToInt32(text);
+				int f = Convert.ToInt32(text.Split(' ')[1]);
 				missingFrames.Add(f);
 				//Debug.Log(f);
 			}
 			catch(Exception exception) {
 			}
 		}
+		//Next data
+		if (text.Contains ("/n")) {
+			Debug.Log ("Next frame");
+			sendMissingFrame(lastsend);
+
+			//The last frame was being send
+			if (lastsend == currentAnimation.getSize ()) {
+				//Now that the animation has been send to the arduino it can be played
+				playAnimation (currentAnimation, currentMatrix);
+			}
+		}
+		
 	}
 
-	private void sendMissingFrames() {
-		foreach (int i in missingFrames) {
-			// /s <filename> <data>
-			string filename = currentAnimation.getByteTextFileName(i);
-			string data = currentAnimation.getByteText (i);
-			Debug.Log ("Sending missing file: " + filename + "(" + data + ")" );
-			udpS.SendMsg("/s " + filename + " " + data);
-		}
-		missingFrames.Clear ();
+	private void sendMissingFrame(int frame) {
+		// /s <filename> <data>
+		string filename = currentAnimation.getByteTextFileName(frame);
+		string data = currentAnimation.getByteText (frame);
+		Debug.Log ("Sending missing file: " + filename + "(" + data + ")" );
+		udpS.SendMsg("/s " + filename + " " + data);
+		lastsend++;
 		//playAnimation (currentAnimation, currentMatrix);
   }
+
+	public void quit() {
+		udpR.quit();
+	}
 }

@@ -22,12 +22,11 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 IPAddress ip(10, 0, 0, 105);
-int sendingport = 56697;
+int sendingport = 8051;
 //EthernetUDP Udp;
 
 unsigned int localPort = 2390;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
-char  ReplyBuffer[] = "xxxx";       // a string to send back
 
 Adafruit_8x8matrix matrix[5];
 const uint8_t MATRIX_EYEL = 0;
@@ -174,42 +173,39 @@ void parseCommand(char data[]) {
       int matrixindex = splitString(String(data),' ', 3).toInt();
       bool incomplete = false;
       for(int i = 0; i < animationlength; i ++) {
-        if(!fileExists(filename + i + ".txt")) {
+        if(!fileExists(filename + String(i) + ".txt")) {
           incomplete = true;
           Serial.println("Frame " + String(i) + " of animation " + filename + " does not exist!");
-          //send a reply, to the IP address and port that sent us the packet we received
-          Udp.beginPacket(Udp.remoteIP(), sendingport);
-          dtostrf(i,4,0,ReplyBuffer);
-          Udp.write(ReplyBuffer);
-          Serial.println("Wrote: " + String(ReplyBuffer) + " to "); printRemoteInfo();
-          Udp.endPacket();
+         sendUDP("/g " + String(i));
         }
       }
       //Send end signal
-      Udp.beginPacket(Udp.remoteIP(),sendingport);
-      ReplyBuffer[0] = 'x';
-      ReplyBuffer[1] = 'e';
-      ReplyBuffer[2] = 'n';
-      ReplyBuffer[3] = 'd';
-      Udp.write(ReplyBuffer);
-      Serial.println("Wrote: " + String(ReplyBuffer) + " to "); printRemoteInfo();
-      Udp.endPacket();
+      sendUDP("/e");
           
       if(!incomplete) {
         playAnimation(filename, matrixindex);
       }
   }
   if(String(data).startsWith("/s")) {
+    Serial.println("/s cmd received");
     String filename = splitString(String(data),' ', 1);
     String d = splitString(String(data),' ', 2);
     if(d.length() == 72) {
         Serial.println("Writing file " + filename + " data: " + d);
         writeFile(filename, d);
+        sendUDP("/n");
     }
     else {
       Serial.println("Invalid data length (" + String(d.length()) + ": " + filename + " | " + d);
     }
   }
+}
+
+void sendUDP(String text) {
+   Udp.beginPacket(Udp.remoteIP(), sendingport);
+   Udp.write(text.c_str());
+   Serial.println("wrote <" + text +  ">");
+   Udp.endPacket();
 }
 
 String splitString(String data, char separator, int index)
@@ -264,15 +260,18 @@ int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
 }
 
 void writeFile(String name, String data) {
+  Serial.println("writeFile()");
   SD.remove(name);
   readingFile = SD.open(name, FILE_WRITE);
   if (readingFile) {
+    Serial.println("opening ok");
     readingFile.println(data);
     readingFile.close();
     Serial.println("Successfully wrote file: " + name);
   } else {
     Serial.println("error opening " + name);
   }
+  Serial.println("finished writeFile()");
 }
 
 void drawImage(uint8_t data[], uint8_t m) {/*

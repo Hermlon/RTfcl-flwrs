@@ -1,3 +1,0 @@
-SendMsg called from async Thread -> no udp?
-
-http://answers.unity3d.com/questions/447701/event-for-unity-editor-pause-and-playstop-events.html
