@@ -115,6 +115,19 @@ void timeBase() {
 }
 
 void loop() {
+  // if there's data available, read a packet
+  int packetSize = Udp.parsePacket();
+  if (packetSize) {
+    // read the packet into packetBufffer
+    int len = Udp.read(packetBuffer, 255);
+    if (len > 0) {
+      packetBuffer[len] = 0;
+    }
+    Serial.print("New Package: ");
+    Serial.println(packetBuffer);
+    parseCommand(packetBuffer);
+  }
+  
   for(int m = 0; m < 5; m ++) {
     if(updateMatrix[m]) {
       remainingTime[m] = loadFile(filename[m], frame[m], m);
@@ -144,18 +157,6 @@ void loop() {
       Serial.println(String(buf).substring(2, sizeof(buf)));
     }
   }*/
-  // if there's data available, read a packet
-  int packetSize = Udp.parsePacket();
-  if (packetSize) {
-    // read the packet into packetBufffer
-    int len = Udp.read(packetBuffer, 255);
-    if (len > 0) {
-      packetBuffer[len] = 0;
-    }
-    Serial.print("New Package: ");
-    Serial.println(packetBuffer);
-    parseCommand(packetBuffer);
-  }
 }
 
 /*
@@ -238,6 +239,7 @@ int loadFile(String filename, uint8_t frame, uint8_t matrix_index) {
         duration |= 1<<i;
       }
     }
+    duration = (int)(duration / 50);
     for(uint8_t n = 0; n < 8; n ++) {
       data[n] = 0;
       for(int i = 7; i >= 0; i --) {

@@ -54,7 +54,9 @@ public class AnimationUDPManager {
 		if(text == "/e") {
 			Debug.Log("End flag received.");
 			lastsend = 0;
-			sendMissingFrame(lastsend);
+			if (missingFrames.Count > 0) {
+				sendMissingFrame(lastsend);
+			}
 		}
 		//get missing frame (/g x)
 		if (text.Contains("/g")) {
