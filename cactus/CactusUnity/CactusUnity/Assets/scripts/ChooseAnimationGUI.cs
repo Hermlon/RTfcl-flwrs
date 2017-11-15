@@ -10,17 +10,18 @@ public class ChooseAnimationGUI : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		/*
+		
 		ledm = new LEDMatrix();
 		ledm.Init();
+		BMLParser bmlParser = new BMLParser();
+		Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/c1_ml.bml");
 		ledm.playAnimation(a1);
-		Debug.Log(a1.intToBinaryString (12));*/
 		//AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.100", 2390);
 		//AnimationUDPManager udp = new AnimationUDPManager ("192.168.0.125", 2390);
 		//udp.playAnimation (a1, AnimationUDPManager.MATRIX_EYER);
 		//udp.SendMsg("drfpighfhj");
 
-		udp = new AnimationUDPManager ("192.168.0.125", 2390);
+		//udp = new AnimationUDPManager ("192.168.0.100", 2390);
 		//udp = new AnimationUDPManager ("127.0.0.1", 57514);
 	}
 
@@ -46,6 +47,12 @@ public class ChooseAnimationGUI : MonoBehaviour {
 		if (GUI.Button (new Rect (10, 90, 150, 30), "Play Animation 2")) {
 			BMLParser bmlParser = new BMLParser();
 			Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/b1_el.bml");
+			udp.playAnimation (a1, AnimationUDPManager.MATRIX_EYER);
+		}
+
+		if (GUI.Button (new Rect (10, 130, 150, 30), "Play Animation 3")) {
+			BMLParser bmlParser = new BMLParser();
+			Animation a1 = bmlParser.loadAnimation("Assets/animations_bml/b1_er.bml");
 			udp.playAnimation (a1, AnimationUDPManager.MATRIX_EYER);
 		}
 	}

@@ -9,8 +9,8 @@
 #include <SPI.h>
 
 // Wifi only:
-//char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
-char ssid[] = "dlink";
+char ssid[] = "TP-LINK_A8FCC8";     // the name of your network
+//char ssid[] = "dlink";
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 char pass[] = "59053491";    // your network key
 WiFiUDP Udp;
@@ -83,8 +83,8 @@ void initWifi() {
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network:    
-   // status = WiFi.begin(ssid, pass);
-status = WiFi.begin(ssid);
+   status = WiFi.begin(ssid, pass);
+    //status = WiFi.begin(ssid);
     // wait 10 seconds for connection:
     delay(10000);
   }
@@ -177,7 +177,7 @@ void parseCommand(char data[]) {
         if(!fileExists(filename + String(i) + ".txt")) {
           incomplete = true;
           Serial.println("Frame " + String(i) + " of animation " + filename + " does not exist!");
-         sendUDP("/g " + String(i));
+          sendUDP("/g " + String(i));
         }
       }
       //Send end signal
@@ -266,14 +266,12 @@ void writeFile(String name, String data) {
   SD.remove(name);
   readingFile = SD.open(name, FILE_WRITE);
   if (readingFile) {
-    Serial.println("opening ok");
     readingFile.println(data);
     readingFile.close();
     Serial.println("Successfully wrote file: " + name);
   } else {
     Serial.println("error opening " + name);
   }
-  Serial.println("finished writeFile()");
 }
 
 void drawImage(uint8_t data[], uint8_t m) {/*

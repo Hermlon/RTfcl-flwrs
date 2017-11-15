@@ -10,7 +10,7 @@
 		<duration>400</duration>
 	</header>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010011100000000000</row>
 		<row>100111110000000000</row>
@@ -21,7 +21,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010110100000000000</row>
 		<row>101111010000000000</row>
@@ -32,7 +32,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>011100100000000000</row>
 		<row>111110010000000000</row>
@@ -43,7 +43,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010000100000000000</row>
 		<row>101100010000000000</row>
@@ -54,7 +54,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010000100000000000</row>
 		<row>100000010000000000</row>
@@ -65,7 +65,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010000100000000000</row>
 		<row>100000010000000000</row>
@@ -76,7 +76,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010000100000000000</row>
 		<row>100000010000000000</row>
@@ -87,7 +87,7 @@
 		<row>001111000000000000</row>
 	</frame>
 
-	<frame duration="1">
+	<frame duration="100">
 		<row>001111000000000000</row>
 		<row>010000100000000000</row>
 		<row>100011010000000000</row>
