@@ -51,14 +51,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\scripts\Animation.cs" />
-     <Compile Include="Assets\scripts\AnimationUDPManager.cs" />
-     <Compile Include="Assets\scripts\BMLParser.cs" />
-     <Compile Include="Assets\scripts\ChooseAnimationGUI.cs" />
-     <Compile Include="Assets\scripts\Frame.cs" />
-     <Compile Include="Assets\scripts\LEDMatrix.cs" />
-     <Compile Include="Assets\scripts\UDPReceiver.cs" />
-     <Compile Include="Assets\scripts\UDPSender.cs" />
+     <Compile Include="Assets\scripts\data\Animation.cs" />
+     <Compile Include="Assets\scripts\data\BMLParser.cs" />
+     <Compile Include="Assets\scripts\data\Frame.cs" />
+     <Compile Include="Assets\scripts\gui\ChooseAnimationGUI.cs" />
+     <Compile Include="Assets\scripts\gui\chooser\GUITouchScroll\GUITouchScroll.cs" />
+     <Compile Include="Assets\scripts\gui\chooser\IconAnimator.cs" />
+     <Compile Include="Assets\scripts\gui\chooser\MakeDots.cs" />
+     <Compile Include="Assets\scripts\gui\chooser\MenuTest.cs" />
+     <Compile Include="Assets\scripts\gui\LEDMatrix.cs" />
+     <Compile Include="Assets\scripts\gui\MakeMatrixTexture.cs" />
+     <Compile Include="Assets\scripts\Main.cs" />
+     <Compile Include="Assets\scripts\udp\AnimationUDPManager.cs" />
+     <Compile Include="Assets\scripts\udp\UDPReceiver.cs" />
+     <Compile Include="Assets\scripts\udp\UDPSender.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
